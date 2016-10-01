@@ -1,0 +1,83 @@
+This MPI-NUMARCK software pacage supports spatial-temproal data compression using Pnetcdf or HDF5 input & output format
+
+Please modify Makefile to change the compiler and library path if needed.
+
+To compile:
+
+	NUMARCK compression:
+
+	Enable Pnetcdf feature, use : make comp_pnetcdf
+	Enable HDF5 feature, use : make comp_hdf5
+	Enable both Pnetcdf & HDF5 feature, use : make comp_pnetcdf_hdf5
+
+	NUMARCK decompression & error check:
+
+	Enable Pnetcdf feature, use : make decomp_pnetcdf
+	Enable HDF5 feature, use : make decomp_hdf5
+	Enable both Pnetcdf & HDF5 feature, use : make decomp_pnetcdf_hdf5
+
+To run:
+
+	NUMARCK compression:
+
+	Usage: mpirun -n 'number_of_process' ./exe_mpi_compress -i 'input_file_name_1' -j 'input_file_name_2' -o 'output_file_name' -v 'varable name'
+	-i input_file_name_1	: first input file name
+	-j input_file_name_2	: second input file name
+	-o output_file_name	: output file name
+	-v varable name		: varable name in input file
+	-m binning_method	: equal (equal bining)/ log (log scaled binning)/ kmeans (kmeans binning)/ topk (top-k binning, default)
+	-e error_rate		: user-defined threshold (default 0.1%)
+	-d			: elements are double data type (default is float)
+	-x			: input file format is hdf5 (default is Pnetcdf)
+	-y			: output file format is hdf5 (default is Pnetcdf)
+	-h			: print this help information
+
+	NUMARCK decompression & error check:
+
+	Usage: mpirun -1 ./exe_mpi_decompress -i 'ori_file_name' -j 'cmp_file_name' -o 'NUMARCK_file_name' -v 'varable name'
+	-i ori_file_name	: first iteration file name
+	-j cmp_file_name	: second iteration file name (comparison purpose)
+	-o NUMARCK_file_name	: NUMARCK file name
+	-v varable name		: varable name in input file
+	-d			: elements are double data type (default is float)
+	-x			: input file format is hdf5 (default is Pnetcdf)
+	-y			: numarck file format is hdf5 (default is Pnetcdf, not supported in this version!)
+	-s start_index		: start index of decompressed data (partial decompression, default is 0)
+	-e end_index		: end index of decompressed data (partial decompression, default is total_data_element_num)
+	-h			: print this help information
+
+Example run commands:
+
+	NUMARCK compression (using comp_pnetcdf_hdf5)
+
+	make comp_pnetcdf_hdf5
+	mpirun -n 4 ./comp_pnetcdf_hdf5 -i ../data/driventurb_3d_hdf5_plt_cnt_0020 -j ../data/driventurb_3d_hdf5_plt_cnt_0021 -o out.nc -x -v velx
+
+	This command will compress variable 'velx' in a small example stir file(HDF5 format) using top-k binning stragety. The output NUMARCK file (Pnetcdf format) is out.nc. The output should look like:
+
+	zlib compression ratio: 1.012274
+	read file time: 0.008817
+	calc change ratio time: 0.000913
+	bining time: 0.008401
+	assig index time: 0.001455
+	trans index time: 0.000163
+	bits opt time: 0.000670
+	zlib time: 0.006231
+	write file time: 0.002166
+	compression ratio: 2.745883
+
+	NUMARCK decompression & error check:
+
+	make decomp_pnetcdf_hdf5
+	mpirun -n 1 ./decomp_pnetcdf_hdf5 -i ../data/driventurb_3d_hdf5_plt_cnt_0020 -j ../data/driventurb_3d_hdf5_plt_cnt_0021 -o out.nc -v velx -x
+	This command will decompress the example NUMARCK file. The output should look like:
+
+	decompression time = 10936
+	ave_abs_error = 0.002106
+
+Note:
+	This version of NUMARCK supports single variable compression. NUMARCK compression outputs average change ratio error, time breakdown and change ratio. NUMARCK decompression & error change outputs the average absolute error and decompression time. NUMARCK decompression does not output the decompressed file. The decompressed data is stored in 'double * data_array'. Decompression only support Pnetcdf file. For bug report or any related question, please contact me via email.
+
+Zheng Yuan (zys133@eecs.northwestern.edu)
+EECS Department
+Northwestern University
