@@ -1,3 +1,4 @@
+This is the code for paper: Parallel Implementation of Lossy Data Compression for Temporal Data Sets, (HiPC 2016)
 This MPI-NUMARCK software pacage supports spatial-temproal data compression using Pnetcdf or HDF5 input & output format
 
 Please modify Makefile to change the compiler and library path if needed.
